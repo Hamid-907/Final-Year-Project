@@ -1,15 +1,34 @@
-Oblivioun Strike
+# ObStrike  
 
-  
-Purpose
-Oblivioun Strike is a  C2 framework that can handle multiple reverse TCP shells.
+## Overview  
+ObStrike is a  Command and Control (C2) framework designed for handling multiple reverse TCP  advanced features. Built to enhance the penetration testing experience, ObStrike supports dynamic payload generation, seamless shell session management.  
 
-The framework's main features include:
+This project is tailored for both offensive and defensive cybersecurity professionals to better understand obfuscation and persistence techniques while improving system resilience against modern threats.  
 
-Payload generation based on default, customizable and/or user defined payload templates (Windows & Linux),
-A dynamically engaged pseudo-shell prompt that can quickly swift between shell sessions,
-File uploads (via http),
-Fileless execution of scripts against active sessions,
-Auto-invoke ConPtyShell against a powershell r-shell session as a new process to gain a fully interactive Windows shell,
-Multiplayer mode,
-Session Defender (a feature that inspects user issued commands for mistakes / unintentional input that may cause a shell to hang).
+---
+
+## Key Features  
+- **Payload Generation**:  
+  - Supports default, customizable, and user-defined payload templates for Windows.  
+
+- **File Operations**:  
+  - Upload files via HTTP.  
+  - Execute scripts directly in memory .  
+- **Interactive Shell**:  
+  - Auto-invoke ConPtyShell for PowerShell reverse shells to obtain fully interactive Windows shells.  
+- **Multiplayer Mode**:  
+  - Collaborate with team members on active sessions in real-time.  
+- **Session Defender**:  
+  - Prevent shell hangs by inspecting user-issued commands for potential errors or unintended inputs.  
+
+---
+
+## Technologies Used  
+- **Python**: Core scripting and functionality.  
+- **PowerShell**: Reverse shell creation and execution on Windows systems.  
+- **Kali Linux**: Penetration testing platform.  
+- **Ash Scripting**: For automation and Linux shell scripting.  
+- **Linode**: Cloud hosting for remote C2 server deployment.  
+
+---
+
